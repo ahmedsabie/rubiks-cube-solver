@@ -35,6 +35,7 @@ private:
     void rotateFaceClockwise (int face);
     void rotateFaceAntiClockwise (int face);
 public:
+    RubiksCube();
     RubiksCube(char cube[6][3][3]);
     
     void turnFrontClockwise();
@@ -53,11 +54,14 @@ public:
     std::string toString();
 };
 
+RubiksCube::RubiksCube() {
+
+}
 
 RubiksCube::RubiksCube(char cube[6][3][3]) {
     for (int i = 0; i < 6; i++){
-        for (int j = 0; j < 6; j++){
-            for (int k = 0; k < 6; k++){
+        for (int j = 0; j < 3; j++){
+            for (int k = 0; k < 3; k++){
                 this -> cube[i][j][k] = cube[i][j][k];
             }
         }
@@ -102,7 +106,7 @@ void RubiksCube::shiftCol(int face, int col, char& a, char& b, char& c){
     char a2, b2, c2;
     a2 = cube[face][0][col];
     b2 = cube[face][1][col];
-    c2 = cube[face][1][col];
+    c2 = cube[face][2][col];
     
     cube[face][0][col] = a;
     cube[face][1][col] = b;
@@ -118,7 +122,7 @@ void RubiksCube::shiftColReverse(int face, int col, char& a, char& b, char& c){
     char a2, b2, c2;
     a2 = cube[face][0][col];
     b2 = cube[face][1][col];
-    c2 = cube[face][1][col];
+    c2 = cube[face][2][col];
     
     cube[face][0][col] = c;
     cube[face][1][col] = b;
@@ -133,26 +137,28 @@ void RubiksCube::shiftColReverse(int face, int col, char& a, char& b, char& c){
 void RubiksCube::rotateFaceClockwise(int face) {
     int temp, temp2;
     
+    // corners
     temp = cube[face][0][0];
-    cube[face][0][0] = cube[face][1][0];
+    cube[face][0][0] = cube[face][2][0];
     
-    temp2 = cube[face][0][1];
-    cube[face][0][1] = temp;
-    
-    temp = cube[face][0][2];
-    cube[face][0][2] = temp2;
-    
-    temp2 = cube[face][1][2];
-    cube[face][1][1] = temp;
+    temp2 = cube[face][0][2];
+    cube[face][0][2] = temp;
     
     temp = cube[face][2][2];
     cube[face][2][2] = temp2;
     
-    temp2 = cube[face][2][1];
-    cube[face][2][1] = temp2;
+    cube[face][2][0] = temp;
     
-    temp = cube[face][2][0];
-    cube[face][2][0] = temp2;
+    
+    // edges
+    temp = cube[face][0][1];
+    cube[face][0][1] = cube[face][1][0];
+    
+    temp2 = cube[face][1][2];
+    cube[face][1][2] = temp;
+    
+    temp = cube[face][2][1];
+    cube[face][2][1] = temp2;
     
     cube[face][1][0] = temp;
     
@@ -162,28 +168,30 @@ void RubiksCube::rotateFaceClockwise(int face) {
 void RubiksCube::rotateFaceAntiClockwise(int face) {
     int temp, temp2;
     
+    // corners
     temp = cube[face][0][0];
-    cube[face][0][0] = cube[face][0][1];
+    cube[face][0][0] = cube[face][0][2];
     
-    temp2 = cube[face][1][0];
-    cube[face][1][0] = temp;
-    
-    temp = cube[face][2][0];
-    cube[face][2][0] = temp2;
-    
-    temp2 = cube[face][2][1];
-    cube[face][2][1] = temp;
+    temp2 = cube[face][2][0];
+    cube[face][2][0] = temp;
     
     temp = cube[face][2][2];
     cube[face][2][2] = temp2;
     
-    temp2 = cube[face][1][2];
-    cube[face][1][2] = temp2;
+    cube[face][0][2] = temp;
     
-    temp = cube[face][0][2];
-    cube[face][0][2] = temp2;
     
-    cube[face][0][1] = temp;
+    // edges
+    temp = cube[face][0][1];
+    cube[face][0][1] = cube[face][1][2];
+    
+    temp2 = cube[face][1][0];
+    cube[face][1][0] = temp;
+    
+    temp = cube[face][2][1];
+    cube[face][2][1] = temp2;
+    
+    cube[face][1][2] = temp;
     
 }
 
@@ -335,6 +343,7 @@ std::string RubiksCube::toString(){
             for (int k = 0; k < 3; k++){
                 theCube += cube[i][j][k];
             }
+            //theCube += "\n";
         }
         //theCube += "\n";
     }
