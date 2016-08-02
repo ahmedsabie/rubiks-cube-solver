@@ -87,99 +87,79 @@ public:
     }
 
     int findNumberMoves() {
-        Trie cubesSeenFwd = BFSForwards();
-        Trie cubesSeenBkwd = BFSBackwards();
-        return matchTries(cubesSeenFwd, cubesSeenBkwd, 0, 0);
-    }
-    int matchTries(Trie &cubesSeenFwd, Trie &cubesSeenBkwd, int nodeIndexFwd, int nodeIndexBkwd) {
-        int best = MAX_MOVES + 1;
-        std::unordered_map<int,int> &numMovesFwd = cubesSeenFwd.numMoves;
-        std::unordered_map<int,int> &numMovesBkwd = cubesSeenBkwd.numMoves;
-        if (numMovesFwd.find(nodeIndexFwd) != numMovesFwd.end() &&
-            numMovesBkwd.find(nodeIndexBkwd) != numMovesBkwd.end())
-        {
-            best = std::min(best, numMovesFwd[nodeIndexFwd] + numMovesBkwd[nodeIndexBkwd]);
-        }
-        std::vector<Node> &treeChildrenFwd = cubesSeenFwd.treeChildren[nodeIndexFwd];
-        std::vector<Node> &treeChildrenBkwd = cubesSeenBkwd.treeChildren[nodeIndexBkwd];
-        for (int i = 0; i < treeChildrenFwd.size(); i++) {
-            for (int j = 0; j < treeChildrenBkwd.size(); j++) {
-                if (treeChildrenFwd[i].letter == treeChildrenBkwd[j].letter) {
-                    best = std::min(best, matchTries(cubesSeenFwd, cubesSeenBkwd, treeChildrenFwd[i].index, treeChildrenBkwd[i].index));
-                }
-            }
-        }
+        return bidirectionalBFS();
     }
 
-    Trie BFSForwards() {
+private:
 
-        Trie cubesSeenFwd;
-        std::queue<std::pair<RubiksCube,int> > activeCubes;
+    int bidirectionalBFS() {
+        Trie cubesSeenFwd, cubesSeenBkwd;
+        std::queue<std::pair<RubiksCube,int> > activeCubesFwd, activeCubesBkwd;
+
         cubesSeenFwd.insertString(cube.toString(), 0);
-        activeCubes.push(std::make_pair(cube, 0));
+        activeCubesFwd.push(std::make_pair(cube, 0));
 
-        int moves;
-        RubiksCube currentCube, nextCube;
-        std::string cubeString;
-
-        while (!activeCubes.empty())
-        {
-            currentCube = activeCubes.front().first;
-            moves = activeCubes.front().second;
-            activeCubes.pop();
-
-            if (moves <= MAX_MOVES / 2) {
-
-                tryLeftClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryLeftAntiClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryRightClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryRightAntiClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryFrontClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryFrontAntiClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryBackClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryBackAntiClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryUpClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryUpAntiClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryDownClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-                tryDownAntiClockwiseTurn(cubesSeenFwd, activeCubes, currentCube, moves);
-            }
-        }
-        return cubesSeenFwd;
-    }
-    Trie BFSBackwards() {
-
-        Trie cubesSeenBkwd;
-        std::queue<std::pair<RubiksCube,int> > activeCubes;
         cubesSeenBkwd.insertString(solvedState.toString(), 0);
-        activeCubes.push(std::make_pair(solvedState, 0));
+        activeCubesBkwd.push(std::make_pair(solvedState, 0));
 
-        int moves;
+        int movesFwd, movesBkwd;
         RubiksCube currentCube, nextCube;
-        std::string cubeString;
 
-        while (!activeCubes.empty())
+        int ans = -1;
+
+        while (!activeCubesFwd.empty() && !activeCubesBkwd.empty())
         {
-            currentCube = activeCubes.front().first;
-            moves = activeCubes.front().second;
-            activeCubes.pop();
+            currentCube = activeCubesFwd.front().first;
+            movesFwd = activeCubesFwd.front().second;
+            activeCubesFwd.pop();
 
-            if (moves <= MAX_MOVES / 2) {
 
-                tryLeftClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryLeftAntiClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryRightClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryRightAntiClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryFrontClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryFrontAntiClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryBackClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryBackAntiClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryUpClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryUpAntiClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryDownClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
-                tryDownAntiClockwiseTurn(cubesSeenBkwd, activeCubes, currentCube, moves);
+            if (movesFwd < MAX_MOVES / 2) {
+
+                tryLeftClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryLeftAntiClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryRightClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryRightAntiClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryFrontClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryFrontAntiClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryBackClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryBackAntiClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryUpClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryUpAntiClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryDownClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+                tryDownAntiClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd);
+            }
+
+
+            if (cubesSeenBkwd.isStringPresent(currentCube.toString())) {
+                movesBkwd = cubesSeenBkwd.getNumMoves(currentCube.toString());
+                ans = movesFwd + movesBkwd;
+                break;
+            }
+
+
+
+            currentCube = activeCubesBkwd.front().first;
+            movesBkwd = activeCubesBkwd.front().second;
+            activeCubesBkwd.pop();
+
+            if (movesBkwd < MAX_MOVES / 2) {
+
+                tryLeftClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryLeftAntiClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryRightClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryRightAntiClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryFrontClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryFrontAntiClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryBackClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryBackAntiClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryUpClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryUpAntiClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryDownClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
+                tryDownAntiClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
             }
         }
-        return cubesSeenBkwd;
+        return ans;
     }
 
     void tryLeftClockwiseTurn(Trie &cubesSeen, std::queue<std::pair<RubiksCube,int> > &activeCubes, RubiksCube &currentCube, int &moves) {
