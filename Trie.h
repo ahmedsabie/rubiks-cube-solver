@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+
 struct Node {
     char letter;
     int index;
@@ -18,9 +19,9 @@ public:
     std::unordered_map<int,int> numMoves;
 
     Trie();
-    void insertString(std::string s,int numMove);
-    bool isStringPresent(std::string s);
-    int getNumMoves(std::string s);
+    void insertCube(std::string cubeString,int numMove);
+    bool isCubePresent(std::string cubeString);
+    int getNumMoves(std::string cubeString);
 
 private:
     int findLetter(std::vector<Node> &nodeChildren, char &letter);
@@ -35,10 +36,10 @@ Trie::Trie() {
     treeChildren.push_back(std::vector<Node>());
 }
 
-void Trie::insertString(std::string s,int numMove) {
+void Trie::insertCube(std::string cubeString,int numMove) {
     int nodeIndex = 0;
     int letterIndex;
-    for (char letter : s) {
+    for (char letter : cubeString) {
         std::vector<Node> &nodeChildren = treeChildren[nodeIndex];
         letterIndex = findLetter(nodeChildren, letter);
         if (letterIndex == -1) {
@@ -50,11 +51,11 @@ void Trie::insertString(std::string s,int numMove) {
     numMoves[nodeIndex] = numMove;
 }
 
-bool Trie::isStringPresent(std::string s) {
+bool Trie::isCubePresent(std::string cubeString) {
     int nodeIndex = 0;
     int letterIndex;
     bool present = true;
-    for (char letter : s) {
+    for (char letter : cubeString) {
         std::vector<Node> &nodeChildren = treeChildren[nodeIndex];
         letterIndex = findLetter(nodeChildren, letter);
         if (letterIndex == -1) {
@@ -67,10 +68,10 @@ bool Trie::isStringPresent(std::string s) {
     return present;
 }
 
-int Trie::getNumMoves(std::string s) {
+int Trie::getNumMoves(std::string cubeString) {
     int nodeIndex = 0;
     int letterIndex;
-    for (char letter : s) {
+    for (char letter : cubeString) {
         std::vector<Node> &nodeChildren = treeChildren[nodeIndex];
         letterIndex = findLetter(nodeChildren, letter);
         if (letterIndex == -1) {

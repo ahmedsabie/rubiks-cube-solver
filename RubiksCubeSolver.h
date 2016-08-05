@@ -223,6 +223,13 @@ int RubiksCubeSolver::bidirectionalBFS() {
 
             tryDownAntiClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd);
         }
+        
+        
+        if (cubesSeenFwd.isStringPresent(currentCube.toString())) {
+            movesFwd = cubesSeenFwd.getNumMoves(currentCube.toString());
+            ans = movesFwd + movesBkwd;
+            break;
+        }
     }
     return ans;
 }
