@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <queue>
+#include <algorithm>
 #include "Trie.h"
 #include "RubiksCube.h"
 
@@ -82,7 +83,7 @@ private:
     const int MAX_MOVES = 26;
     
     int bidirectionalBFS();
-    // add
+    
     void tryLeftClockwiseTurn(Trie &cubesSeen, std::queue<std::pair<RubiksCube,int> > &activeCubes,
                               RubiksCube &currentCube, int moves, int currentCubeIndex);
     
@@ -119,10 +120,13 @@ private:
     void tryDownAntiClockwiseTurn(Trie &cubesSeen, std::queue<std::pair<RubiksCube,int> > &activeCubes,
                                   RubiksCube &currentCube, int moves, int currentCubeIndex);
     
+    std::string fwdPath, bkwdPath;
+    std::string retraceHalfPath (Trie &cubesSeen, std::string &currentCubeString);
+    
 public:
     RubiksCubeSolver(RubiksCube cube);
     int findMinNumberOfMoves();
-    // std::string getPath();
+    std::string getPath();
 };
 
 
@@ -131,6 +135,8 @@ public:
 RubiksCubeSolver::RubiksCubeSolver(RubiksCube cube) {
     this -> cube = cube;
     solvedState = RubiksCube(solvedCubeArray);
+    fwdPath = "";
+    bkwdPath = "";
     
 }
 
@@ -143,14 +149,18 @@ int RubiksCubeSolver::bidirectionalBFS() {
     Trie cubesSeenFwd, cubesSeenBkwd;
     std::queue<std::pair<RubiksCube,int> > activeCubesFwd, activeCubesBkwd;
     
-    int trieNodeIndex = cubesSeenFwd.insertCube(cube.toString(), 0, 0, true, -1); // for the first cube, what is the parentIndex & what is lastMove?
+    std::string cubeString = cube.toString();
+    std::string solvedStateCubeString = solvedState.toString();
+    
+    int trieNodeIndex = cubesSeenFwd.insertCube(cubeString, 0, 0, true, -1);
     activeCubesFwd.push(std::make_pair(cube, trieNodeIndex));
     
-    trieNodeIndex = cubesSeenBkwd.insertCube(solvedState.toString(), 0, 0, true, -1); // for the first cube, what is the parentIndex & what is lastMove?
+    trieNodeIndex = cubesSeenBkwd.insertCube(solvedStateCubeString, 0, 0, true, -1);
     activeCubesBkwd.push(std::make_pair(solvedState, trieNodeIndex));
     
     int currentCubeIndex, movesFwd, movesBkwd;
     RubiksCube currentCube, nextCube;
+    std::string currentCubeString;
     
     int ans = -1;
     
@@ -162,6 +172,7 @@ int RubiksCubeSolver::bidirectionalBFS() {
         
         movesFwd = cubesSeenFwd.getNumMoves(currentCubeIndex);
         
+        //std::cout << currentCube.toString() << std::endl;
         
         if (movesFwd < MAX_MOVES / 2) {
             
@@ -190,9 +201,12 @@ int RubiksCubeSolver::bidirectionalBFS() {
             tryDownAntiClockwiseTurn(cubesSeenFwd, activeCubesFwd, currentCube, movesFwd, currentCubeIndex);
         }
         
+        //std::cout << currentCube.toString() << std::endl;
         
-        if (cubesSeenBkwd.isCubePresent(currentCube.toString())) {
-            movesBkwd = cubesSeenBkwd.getNumMoves(currentCube.toString());
+        currentCubeString = currentCube.toString();
+        
+        if (cubesSeenBkwd.isCubePresent(currentCubeString)) {
+            movesBkwd = cubesSeenBkwd.getNumMoves(currentCubeString);
             ans = movesFwd + movesBkwd;
             break;
         }
@@ -233,14 +247,68 @@ int RubiksCubeSolver::bidirectionalBFS() {
             tryDownAntiClockwiseTurn(cubesSeenBkwd, activeCubesBkwd, currentCube, movesBkwd, currentCubeIndex);
         }
         
+        currentCubeString = currentCube.toString();
         
-        if (cubesSeenFwd.isCubePresent(currentCube.toString())) {
-            movesFwd = cubesSeenFwd.getNumMoves(currentCube.toString());
+        
+        if (cubesSeenFwd.isCubePresent(currentCubeString)) {
+            movesFwd = cubesSeenFwd.getNumMoves(currentCubeString);
             ans = movesFwd + movesBkwd;
             break;
         }
     }
+    
+    fwdPath = retraceHalfPath(cubesSeenFwd, currentCubeString);
+    //std::cout << fwdPath << std::endl;
+    bkwdPath = retraceHalfPath(cubesSeenBkwd, currentCubeString);
+    //std::cout << bkwdPath << std::endl;
+    
     return ans;
+}
+
+std::string RubiksCubeSolver::retraceHalfPath(Trie &cubesSeen, std::string &currentCubeString) {
+    int currentCubeIndex = cubesSeen.getCubeIndex(currentCubeString);
+    
+    std::string halfPath = "";
+    
+    while (currentCubeIndex != -1) {
+        halfPath.append(cubesSeen.getLastMove(currentCubeIndex));
+        //std::cout << halfPath << " " << currentCubeIndex << std::endl;
+        
+        currentCubeIndex = cubesSeen.getParentIndex(currentCubeIndex);
+    }
+    
+    return halfPath;
+}
+
+std::string RubiksCubeSolver::getPath() {
+    std::string newFwdPath = "", newBkwdPath = "";
+    
+    // reverse order of fwdPath
+    reverse(fwdPath.begin(), fwdPath.end());
+    
+    // skip nonexistent move of initial cube
+    for (int i = 2; i < (int)fwdPath.size(); i+=2){
+        newFwdPath += fwdPath[i+1];
+        newFwdPath += fwdPath[i];
+    }
+    
+    //std::cout << newFwdPath << std::endl;
+    
+    // use opposite moves of bkwdPath
+    for (int i = 0; i < (int)bkwdPath.size()-2; i+=2){
+        newBkwdPath += bkwdPath[i];
+        
+        if (bkwdPath[i+1] == ' '){
+            newBkwdPath += '\'';
+        } else {
+            newBkwdPath += ' ';
+        }
+    }
+    
+    //std::cout << newBkwdPath << std::endl;
+
+    // return concatenation of fwdPath and bkwdPath
+    return newFwdPath.append(newBkwdPath);
 }
 
 void RubiksCubeSolver::tryLeftClockwiseTurn(Trie &cubesSeen, std::queue<std::pair<RubiksCube,int> > &activeCubes,
@@ -254,7 +322,7 @@ void RubiksCubeSolver::tryLeftClockwiseTurn(Trie &cubesSeen, std::queue<std::pai
     std::string cubeString = nextCube.toString();
     
     if (!cubesSeen.isCubePresent(cubeString)) {
-        nextCubeIndex = cubesSeen.insertCube(cubeString, moves+1, 'L', true, currentCubeIndex); // parentID = ID of currentCube
+        nextCubeIndex = cubesSeen.insertCube(cubeString, moves+1, 'L', true, currentCubeIndex); 
         activeCubes.push(std::make_pair(nextCube, nextCubeIndex));
     }
 }
