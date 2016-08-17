@@ -36,11 +36,14 @@ struct Trie {
     
 public:
     Trie();
-    int insertCube(std::string cubeString,int numMoves, char lastMove, bool isClockwise, int parentIndex);
-    bool isCubePresent(std::string cubeString);
-    int getNumMoves(std::string cubeString);
+    int insertCube(std::string &cubeString,int numMoves, char lastMove, bool isClockwise, int parentIndex);
+    bool isCubePresent(std::string &cubeString);
+    int getCubeIndex(std::string &cubeString);
+    int getNumMoves(std::string &cubeString);
     int getNumMoves(int trieNodeIndex);
-    int getParentIndex(std::string cubeString);
+    int getParentIndex(std::string &cubeString);
+    int getParentIndex(int cubeNodeIndex);
+    std::string getLastMove(int cubeNodeIndex);
     
 private:
     int trieNodeCount;
@@ -49,7 +52,6 @@ private:
     
     int findLetter(std::vector<TrieNode> &nodeChildren, char letter);
     int insertTrieNode(std::vector<TrieNode> &nodeChildren, char letter);
-    
 };
 
 
@@ -59,7 +61,7 @@ Trie::Trie() {
     treeChildren.push_back(std::vector<TrieNode>());
 }
 
-int Trie::insertCube(std::string cubeString, int numMoves, char lastMove, bool isClockwise, int parentIndex) {
+int Trie::insertCube(std::string &cubeString, int numMoves, char lastMove, bool isClockwise, int parentIndex) {
     int trieNodeIndex = 0;
     int letterIndex;
     for (char letter : cubeString) {
@@ -71,12 +73,16 @@ int Trie::insertCube(std::string cubeString, int numMoves, char lastMove, bool i
             trieNodeIndex = nodeChildren[letterIndex].index;
         }
     }
+    //std::cout << trieNodeIndex << std::endl;
     cubeStateData[trieNodeIndex] = CubeNode(numMoves, lastMove, isClockwise, parentIndex);
+    //std::cout << "numMoves: " << cubeStateData[trieNodeIndex].numMoves << std::endl;
+    //std::cout << "lastMove: " << cubeStateData[trieNodeIndex].lastMove << " " << cubeStateData[trieNodeIndex].isClockwise << std::endl;
+    //std::cout << "parentIndex: " << cubeStateData[trieNodeIndex].parentIndex << std::endl;
     
     return trieNodeIndex;
 }
 
-bool Trie::isCubePresent(std::string cubeString) {
+bool Trie::isCubePresent(std::string &cubeString) {
     int trieNodeIndex = 0;
     int letterIndex;
     bool present = true;
@@ -93,7 +99,22 @@ bool Trie::isCubePresent(std::string cubeString) {
     return present;
 }
 
-int Trie::getNumMoves(std::string cubeString) {
+int Trie::getCubeIndex(std::string &cubeString) {
+    int trieNodeIndex = 0;
+    int letterIndex;
+    for (char letter : cubeString) {
+        std::vector<TrieNode> &nodeChildren = treeChildren[trieNodeIndex];
+        letterIndex = findLetter(nodeChildren, letter);
+        if (letterIndex == -1) {
+            return -1;
+        } else {
+            trieNodeIndex = nodeChildren[letterIndex].index;
+        }
+    }
+    return trieNodeIndex;
+}
+
+int Trie::getNumMoves(std::string &cubeString) {
     int trieNodeIndex = 0;
     int letterIndex;
     for (char letter : cubeString) {
@@ -112,30 +133,49 @@ int Trie::getNumMoves(int trieNodeIndex) {
     return cubeStateData[trieNodeIndex].numMoves;
 }
 
-int Trie::getParentIndex(std::string cubeString) {
-    int insertTrieNode = 0;
+int Trie::getParentIndex(std::string &cubeString) {
+    int trieNodeIndex = 0;
     int letterIndex;
     for (char letter : cubeString) {
-        std::vector<TrieNode> &nodeChildren = treeChildren[insertTrieNode];
+        std::vector<TrieNode> &nodeChildren = treeChildren[trieNodeIndex];
         letterIndex = findLetter(nodeChildren, letter);
         if (letterIndex == -1) {
             return -1;
         } else {
-            insertTrieNode = nodeChildren[letterIndex].index;
+            trieNodeIndex = nodeChildren[letterIndex].index;
         }
     }
-    return cubeStateData[insertTrieNode].parentIndex;
+    return cubeStateData[trieNodeIndex].parentIndex;
+}
+
+int Trie::getParentIndex(int cubeNodeIndex) {
+    return cubeStateData[cubeNodeIndex].parentIndex;
+}
+
+std::string Trie::getLastMove(int cubeNodeIndex) {
+    std::string move = "";
+    
+    //std::cout << (int)cubeStateData[cubeNodeIndex].lastMove << " ";
+    
+    move += cubeStateData[cubeNodeIndex].lastMove;
+    
+    if (cubeStateData[cubeNodeIndex].isClockwise){
+        move += ' ';
+    } else {
+        move += '\'';
+    }
+    return move;
 }
 
 int Trie::findLetter(std::vector<TrieNode> &nodeChildren, char letter) {
-    int index = -1;
+    int trieNodeIndex = -1;
     for (int i = 0; i < nodeChildren.size(); i++) {
         if (nodeChildren[i].letter == letter){
-            index = i;
+            trieNodeIndex = i;
             break;
         }
     }
-    return index;
+    return trieNodeIndex;
 }
 
 int Trie::insertTrieNode(std::vector<TrieNode> &nodeChildren, char letter) {
