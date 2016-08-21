@@ -1,0 +1,255 @@
+.cubelet
+{
+    position: absolute;
+
+    width: 98px;
+    height: 98px;
+
+    transition: transform .5s linear;
+    transform-origin: 150px 150px;
+
+    border-width: 1px;
+    border-style: solid;
+}
+#perspective-wrapper
+{
+    perspective: 1000px;
+    perspective-origin: 50% 150px;
+}
+#cube
+{
+    position: relative;
+
+    width: 300px;
+    height: 300px;
+    margin: 200px auto;
+
+    /* changes the angle that the cube is viewed from by default */
+    transform: rotateY(30deg);
+    transform-style: preserve-3d;
+}
+/* the following ID selectors each represent one cubelet,
+and set their correct orientation and translation in space */ 
+
+/* NOTE: the row and column label for all cubelets is relative to
+the face orientation that results after starting at the front face, 
+and then rotating the cube either left/right to get to the 
+left,right,and back faces, or rotating up/down to get to the 
+up and down faces*/
+
+#up-face-top-row-left-col
+{
+    transform: rotateX(90deg) translate3d(0px, 0px, 150px);
+}
+#up-face-top-row-middle-col
+{
+    transform: rotateX(90deg) translate3d(100px, 0px, 150px);
+}
+#up-face-top-row-right-col
+{
+    transform: rotateX(90deg) translate3d(200px, 0px, 150px);
+}
+#up-face-middle-row-left-col
+{
+    transform: rotateX(90deg) translate3d(0px, 100px, 150px);
+}
+#up-face-middle-row-middle-col
+{
+    transform: rotateX(90deg) translate3d(100px, 100px, 150px);
+}
+#up-face-middle-row-right-col
+{
+    transform: rotateX(90deg) translate3d(200px, 100px, 150px);
+}
+#up-face-bottom-row-left-col
+{
+    transform: rotateX(90deg) translate3d(0px, 200px, 150px);
+}
+#up-face-bottom-row-middle-col
+{
+    transform: rotateX(90deg) translate3d(100px, 200px, 150px);
+}
+#up-face-bottom-row-right-col
+{
+    transform: rotateX(90deg) translate3d(200px, 200px, 150px);
+}
+#down-face-top-row-left-col
+{
+    transform: rotateX(-90deg) translate3d(0px, 0px, 150px);
+}
+#down-face-top-row-middle-col
+{
+    transform: rotateX(-90deg) translate3d(100px, 0px, 150px);
+}
+#down-face-top-row-right-col
+{
+    transform: rotateX(-90deg) translate3d(200px, 0px, 150px);
+}
+#down-face-middle-row-left-col
+{
+    transform: rotateX(-90deg) translate3d(0px, 100px, 150px);
+}
+#down-face-middle-row-middle-col
+{
+    transform: rotateX(-90deg) translate3d(100px, 100px, 150px);
+}
+#down-face-middle-row-right-col
+{
+    transform: rotateX(-90deg) translate3d(200px, 100px, 150px);
+}
+#down-face-bottom-row-left-col
+{
+    transform: rotateX(-90deg) translate3d(0px, 200px, 150px);
+}
+#down-face-bottom-row-middle-col
+{
+    transform: rotateX(-90deg) translate3d(100px, 200px, 150px);
+}
+#down-face-bottom-row-right-col
+{
+    transform: rotateX(-90deg) translate3d(200px, 200px, 150px);
+}
+#left-face-top-row-left-col
+{
+    transform: rotateY(-90deg) translate3d(0px, 0px, 150px);
+}
+#left-face-top-row-middle-col
+{
+    transform: rotateY(-90deg) translate3d(100px, 0px, 150px);
+}
+#left-face-top-row-right-col
+{
+    transform: rotateY(-90deg) translate3d(200px, 0px, 150px);
+}
+#left-face-middle-row-left-col
+{
+    transform: rotateY(-90deg) translate3d(0px, 100px, 150px);
+}
+#left-face-middle-row-middle-col
+{
+    transform: rotateY(-90deg) translate3d(100px, 100px, 150px);
+}
+#left-face-middle-row-right-col
+{
+    transform: rotateY(-90deg) translate3d(200px, 100px, 150px);
+}
+#left-face-bottom-row-left-col
+{
+    transform: rotateY(-90deg) translate3d(0px, 200px, 150px);
+}
+#left-face-bottom-row-middle-col
+{
+    transform: rotateY(-90deg) translate3d(100px, 200px, 150px);
+}
+#left-face-bottom-row-right-col
+{
+    transform: rotateY(-90deg) translate3d(200px, 200px, 150px);
+}
+#right-face-top-row-left-col
+{
+    transform: rotateY(90deg) translate3d(0px, 0px, 150px);
+}
+#right-face-top-row-middle-col
+{
+    transform: rotateY(90deg) translate3d(100px, 0px, 150px);
+}
+#right-face-top-row-right-col
+{
+    transform: rotateY(90deg) translate3d(200px, 0px, 150px);
+}
+#right-face-middle-row-left-col
+{
+    transform: rotateY(90deg) translate3d(0px, 100px, 150px);
+}
+#right-face-middle-row-middle-col
+{
+    transform: rotateY(90deg) translate3d(100px, 100px, 150px);
+}
+#right-face-middle-row-right-col
+{
+    transform: rotateY(90deg) translate3d(200px, 100px, 150px);
+}
+#right-face-bottom-row-left-col
+{
+    transform: rotateY(90deg) translate3d(0px, 200px, 150px);
+}
+#right-face-bottom-row-middle-col
+{
+    transform: rotateY(90deg) translate3d(100px, 200px, 150px);
+}
+#right-face-bottom-row-right-col
+{
+    transform: rotateY(90deg) translate3d(200px, 200px, 150px);
+}
+#front-face-top-row-left-col
+{
+    transform: translate3d(0px, 0px, 150px);
+}
+#front-face-top-row-middle-col
+{
+    transform: translate3d(100px, 0px, 150px);
+}
+#front-face-top-row-right-col
+{
+    transform: translate3d(200px, 0px, 150px);
+}
+#front-face-middle-row-left-col
+{
+    transform: translate3d(0px, 100px, 150px);
+}
+#front-face-middle-row-middle-col
+{
+    transform: translate3d(100px, 100px, 150px);
+}
+#front-face-middle-row-right-col
+{
+    transform: translate3d(200px, 100px, 150px);
+}
+#front-face-bottom-row-left-col
+{
+    transform: translate3d(0px, 200px, 150px);
+}
+#front-face-bottom-row-middle-col
+{
+    transform: translate3d(100px, 200px, 150px);
+}
+#front-face-bottom-row-right-col
+{
+    transform: translate3d(200px, 200px, 150px);
+}
+#back-face-top-row-left-col
+{
+    transform: rotateY(180deg) translate3d(0px, 0px, 150px);
+}
+#back-face-top-row-middle-col
+{
+    transform: rotateY(180deg) translate3d(100px, 0px, 150px);
+}
+#back-face-top-row-right-col
+{
+    transform: rotateY(180deg) translate3d(200px, 0px, 150px);
+}
+#back-face-middle-row-left-col
+{
+    transform: rotateY(180deg) translate3d(0px, 100px, 150px);
+}
+#back-face-middle-row-middle-col
+{
+    transform: rotateY(180deg) translate3d(100px, 100px, 150px);
+}
+#back-face-middle-row-right-col
+{
+    transform: rotateY(180deg) translate3d(200px, 100px, 150px);
+}
+#back-face-bottom-row-left-col
+{
+    transform: rotateY(180deg) translate3d(0px, 200px, 150px);
+}
+#back-face-bottom-row-middle-col
+{
+    transform: rotateY(180deg) translate3d(100px, 200px, 150px);
+}
+#back-face-bottom-row-right-col
+{
+    transform: rotateY(180deg) translate3d(200px, 200px, 150px);
+}
