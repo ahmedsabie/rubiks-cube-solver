@@ -23,20 +23,20 @@ CUBELET_DELAY_MS = 8;
 //id is the html id of the cubelet, and transform is the current transformation style string 
 //of the cubelet
 function Cubelet() {
-	this.id = null;
-	this.transform = null;
+  this.id = null;
+  this.transform = null;
 }
 function Cubelet(id, transformStr) {
-	this.id = id;
-	this.transform = transformStr;
+  this.id = id;
+  this.transform = transformStr;
 }
 
 //cubelets will be stored in this 3D array, with the 3 indices representing face, row, and col respectively
 cubelets = [];
 
 function main() {
-	setUpCubeletInfo();
-	assignTransformStrs();
+  setUpCubeletInfo();
+  assignTransformStrs();
 }
 
 
@@ -49,206 +49,252 @@ by getComputedStyle as the latter returns the matrix3d representation,
 which is difficult to work with */
 
 function setUpCubeletInfo() {
-	var translateZ = 150;
+  var translateZ = 150;
 
-	for (var i = 0; i < faces.length; i++) {
-		var faceCubelets = [];
-		var translateY = 0;
-		for (var j = 0; j < rows.length; j++) {
-			var rowCubelets = [];
-			var translateX = 0;
-			for (var k = 0; k < cols.length; k++) {
-				var cubeletId = faces[i] + "-face-" + rows[j] + "-row-" + cols[k] + "-col";
-				var transformStr = faceRotations[i] + " translate3d(" + translateX + "px, " + translateY + "px, " + translateZ + "px)";
+  for (var i = 0; i < faces.length; i++) {
+    var faceCubelets = [];
+    var translateY = 0;
+    for (var j = 0; j < rows.length; j++) {
+      var rowCubelets = [];
+      var translateX = 0;
+      for (var k = 0; k < cols.length; k++) {
+        var cubeletId = faces[i] + "-face-" + rows[j] + "-row-" + cols[k] + "-col";
+        var transformStr = faceRotations[i] + " translate3d(" + translateX + "px, " + translateY + "px, " + translateZ + "px)";
 
-				var cubelet = new Cubelet(cubeletId, transformStr);
+        var cubelet = new Cubelet(cubeletId, transformStr);
 
-				rowCubelets.push(cubelet);
+        rowCubelets.push(cubelet);
 
-				translateX += 100;
-			}
-			faceCubelets.push(rowCubelets);
+        translateX += 100;
+      }
+      faceCubelets.push(rowCubelets);
 
-			translateY += 100;
-		}
-		cubelets.push(faceCubelets);
-	}
+      translateY += 100;
+    }
+    cubelets.push(faceCubelets);
+  }
+}
+
+//reassigns the original transformation strings (called after cubelets are swapped)
+function updateCubeletInfo() {
+  var translateZ = 150;
+
+  for (var i = 0; i < faces.length; i++) {
+    var translateY = 0;
+    for (var j = 0; j < rows.length; j++) {
+      var translateX = 0;
+      for (var k = 0; k < cols.length; k++) {
+        var transformStr = faceRotations[i] + " translate3d(" + translateX + "px, " + translateY + "px, " + translateZ + "px)";
+        var cubelet = cubelets[i][j][k];
+
+        cubelet.transform = transformStr;
+
+        var element = document.getElementById(cubelet.id);
+        element.offsetHeight;
+        element.style.transform = transformStr;
+
+        translateX += 100;
+      }
+
+      translateY += 100;
+    }
+  }
 }
 
 function assignTransformStrs() {
-	for (var i = 0; i < cubelets.length; i++) {
-		for (var j = 0; j < cubelets[i].length; j++) {
-			for (var k = 0; k < cubelets[i][j].length; k++) {
-				var element = document.getElementById(cubelets[i][j][k].id);
-				element.style.transform = cubelets[i][j][k].transform;
-			}
-		}
-	}
+  for (var i = 0; i < cubelets.length; i++) {
+    for (var j = 0; j < cubelets[i].length; j++) {
+      for (var k = 0; k < cubelets[i][j].length; k++) {
+        var element = document.getElementById(cubelets[i][j][k].id);
+        element.style.transform = cubelets[i][j][k].transform;
+      }
+    }
+  }
 }
 
 function rotateFrontFace(isClockwise) {
-	visualRotateFrontFace(isClockwise);
+  visualRotateFrontFace(isClockwise);
 
-	if (isClockwise) {
-		arrayRotateFrontClockwise();
-	} else {
-		arrayRotateFrontAntiClockwise();
-	}
+  //update the array after animation is done, hence the delay 
+  setTimeout(function(){ 
+    if (isClockwise) {
+      arrayRotateFrontClockwise();
+    } else {
+      arrayRotateFrontAntiClockwise();
+    }
+
+    updateCubeletInfo();
+  }, CUBELET_DELAY_MS*200);
+  
 }
 
 function rotateBackFace(isClockwise) {
-	isClockwise = !isClockwise;
+  isClockwise = !isClockwise;
 
-	visualRotateBackFace(isClockwise);
+  visualRotateBackFace(isClockwise);
 
-	if (isClockwise) {
-		arrayRotateBackClockwise();
-	} else {
-		arrayRotateBackAntiClockwise();
-	}
-}
+  //update the array after animation is done, hence the delay 
+  setTimeout(function(){ 
+    if (isClockwise) {
+      arrayRotateBackClockwise();
+    } else {
+      arrayRotateBackAntiClockwise();
+    }
 
-function rotateBackFace(isClockwise) {
-	isClockwise = !isClockwise;
-
-	visualRotateBackFace(isClockwise);
-
-	if (isClockwise) {
-		arrayRotateBackClockwise();
-	} else {
-		arrayRotateBackAntiClockwise();
-	}
+    updateCubeletInfo();
+  }, CUBELET_DELAY_MS*200);
 }
 
 function rotateLeftFace(isClockwise) {
-	isClockwise = !isClockwise;
+  isClockwise = !isClockwise;
 
-	visualRotateLeftFace(isClockwise);
+  visualRotateLeftFace(isClockwise);
 
-	if (isClockwise) {
-		arrayRotateLeftClockwise();
-	} else {
-		arrayRotateLeftAntiClockwise();
-	}
+  //update the array after animation is done, hence the delay 
+  setTimeout(function(){ 
+    if (isClockwise) {
+      arrayRotateLeftClockwise();
+    } else {
+      arrayRotateLeftAntiClockwise();
+    }
+
+    updateCubeletInfo();
+  }, CUBELET_DELAY_MS*200);
 
 }
 
 function rotateRightFace(isClockwise) {
-	visualRotateRightFace(isClockwise);
+  visualRotateRightFace(isClockwise);
 
-	if (isClockwise) {
-		arrayRotateRightClockwise();
-	} else {
-		arrayRotateRightAntiClockwise();
-	}
+  //update the array after animation is done, hence the delay 
+  setTimeout(function(){ 
+    if (isClockwise) {
+      arrayRotateRightClockwise();
+    } else {
+      arrayRotateRightAntiClockwise();
+    }
+
+    updateCubeletInfo();
+  }, CUBELET_DELAY_MS*200);
 
 }
 
 function rotateUpFace(isClockwise) {
-	isClockwise = !isClockwise;
+  isClockwise = !isClockwise;
 
-	visualRotateUpFace(isClockwise);
+  visualRotateUpFace(isClockwise);
 
-	if (isClockwise) {
-		arrayRotateUpClockwise();
-	} else {
-		arrayRotateUpAntiClockwise();
-	}
+  //update the array after animation is done, hence the delay 
+  setTimeout(function(){ 
+    if (isClockwise) {
+      arrayRotateUpClockwise();
+    } else {
+      arrayRotateUpAntiClockwise();
+    }
+
+    updateCubeletInfo();
+  }, CUBELET_DELAY_MS*200);
 
 }
 
 function rotateDownFace(isClockwise) {
-	visualRotateDownFace(isClockwise);
+  visualRotateDownFace(isClockwise);
 
-	if (isClockwise) {
-		arrayRotateDownClockwise();
-	} else {
-		arrayRotateDownAntiClockwise();
-	}
+  //update the array after animation is done, hence the delay 
+  setTimeout(function(){ 
+    if (isClockwise) {
+      arrayRotateDownClockwise();
+    } else {
+      arrayRotateDownAntiClockwise();
+    }
+
+    updateCubeletInfo();
+  }, CUBELET_DELAY_MS*200);
 
 }
+
 //all functions that start with "visual" change the cube's CSS code
 
 function visualRotateFrontFace(isClockwise) {
-	visualRotateFace("F", "Z", isClockwise);
+  visualRotateFace("F", "Z", isClockwise);
 
-	visualRotateRow("U", "B", "Z", isClockwise);
-	visualRotateRow("D", "T", "Z", isClockwise);
-	visualRotateCol("L", "R", "Z", isClockwise);
-	visualRotateCol("R", "L", "Z", isClockwise);
+  visualRotateRow("U", "B", "Z", isClockwise);
+  visualRotateRow("D", "T", "Z", isClockwise);
+  visualRotateCol("L", "R", "Z", isClockwise);
+  visualRotateCol("R", "L", "Z", isClockwise);
 }
 
 function visualRotateBackFace(isClockwise) {
-	visualRotateFace("B", "Z", isClockwise);
+  visualRotateFace("B", "Z", isClockwise);
 
-	visualRotateRow("U", "T", "Z", isClockwise);
-	visualRotateRow("D", "B", "Z", isClockwise);
-	visualRotateCol("L", "L", "Z", isClockwise);
-	visualRotateCol("R", "R", "Z", isClockwise);
+  visualRotateRow("U", "T", "Z", isClockwise);
+  visualRotateRow("D", "B", "Z", isClockwise);
+  visualRotateCol("L", "L", "Z", isClockwise);
+  visualRotateCol("R", "R", "Z", isClockwise);
 }
 
 function visualRotateLeftFace(isClockwise) {
-	visualRotateFace("L", "X", isClockwise);
+  visualRotateFace("L", "X", isClockwise);
 
-	visualRotateCol("U", "L", "X", isClockwise);
-	visualRotateCol("B", "R", "X", isClockwise);
-	visualRotateCol("D", "L", "X", isClockwise);
-	visualRotateCol("F", "L", "X", isClockwise);
+  visualRotateCol("U", "L", "X", isClockwise);
+  visualRotateCol("B", "R", "X", isClockwise);
+  visualRotateCol("D", "L", "X", isClockwise);
+  visualRotateCol("F", "L", "X", isClockwise);
 }
 
 function visualRotateRightFace(isClockwise) {
-	visualRotateFace("R", "X", isClockwise);
+  visualRotateFace("R", "X", isClockwise);
 
-	visualRotateCol("U", "R", "X", isClockwise);
-	visualRotateCol("B", "L", "X", isClockwise);
-	visualRotateCol("D", "R", "X", isClockwise);
-	visualRotateCol("F", "R", "X", isClockwise);
+  visualRotateCol("U", "R", "X", isClockwise);
+  visualRotateCol("B", "L", "X", isClockwise);
+  visualRotateCol("D", "R", "X", isClockwise);
+  visualRotateCol("F", "R", "X", isClockwise);
 }
 
 function visualRotateUpFace(isClockwise) {
-	visualRotateFace("U", "Y", isClockwise);
+  visualRotateFace("U", "Y", isClockwise);
 
-	visualRotateRow("L", "T", "Y", isClockwise);
-	visualRotateRow("F", "T", "Y", isClockwise);
-	visualRotateRow("R", "T", "Y", isClockwise);
-	visualRotateRow("B", "T", "Y", isClockwise);
+  visualRotateRow("L", "T", "Y", isClockwise);
+  visualRotateRow("F", "T", "Y", isClockwise);
+  visualRotateRow("R", "T", "Y", isClockwise);
+  visualRotateRow("B", "T", "Y", isClockwise);
 }
 
 function visualRotateDownFace(isClockwise) {
-	visualRotateFace("D", "Y", isClockwise);
+  visualRotateFace("D", "Y", isClockwise);
 
-	visualRotateRow("L", "B", "Y", isClockwise);
-	visualRotateRow("F", "B", "Y", isClockwise);
-	visualRotateRow("R", "B", "Y", isClockwise);
-	visualRotateRow("B", "B", "Y", isClockwise);
+  visualRotateRow("L", "B", "Y", isClockwise);
+  visualRotateRow("F", "B", "Y", isClockwise);
+  visualRotateRow("R", "B", "Y", isClockwise);
+  visualRotateRow("B", "B", "Y", isClockwise);
 }
 
 /*dimension in all the following functions must be given as
 "X", "Y", or "Z" */
 
 function visualRotateFace(face, dimension, isClockwise) {
-	var faceId = faceToId[face];
-	for (var i = 0; i < cubelets[faceId].length; i++) {
-		for (var j = 0; j < cubelets[faceId][i].length; j++) {
-			visualRotateCubelet(faceId, i, j, dimension, 90, isClockwise);
-		}
-	}
+  var faceId = faceToId[face];
+  for (var i = 0; i < cubelets[faceId].length; i++) {
+    for (var j = 0; j < cubelets[faceId][i].length; j++) {
+      visualRotateCubelet(faceId, i, j, dimension, 90, isClockwise);
+    }
+  }
 }
 
 function visualRotateRow(face, row, dimension, isClockwise) {
-	var faceId = faceToId[face];
-	var rowId = rowToId[row];
-	for (var i = 0; i < cubelets[faceId][rowId].length; i++) {
-		visualRotateCubelet(faceId, rowId, i, dimension, 90, isClockwise);
-	}
+  var faceId = faceToId[face];
+  var rowId = rowToId[row];
+  for (var i = 0; i < cubelets[faceId][rowId].length; i++) {
+    visualRotateCubelet(faceId, rowId, i, dimension, 90, isClockwise);
+  }
 }
 
 function visualRotateCol(face, col, dimension, isClockwise) {
-	var faceId = faceToId[face];
-	var colId = colToId[col];
-	for (var i = 0; i < cubelets[faceId].length; i++) {
-		visualRotateCubelet(faceId, i, colId, dimension, 90, isClockwise);
-	}
+  var faceId = faceToId[face];
+  var colId = colToId[col];
+  for (var i = 0; i < cubelets[faceId].length; i++) {
+    visualRotateCubelet(faceId, i, colId, dimension, 90, isClockwise);
+  }
 }
 
 /*rotates the cubelet with face id i, row id j, and col id k,
@@ -256,64 +302,64 @@ across the dimension*/
 
 function visualRotateCubelet(i, j, k, dimension, degrees, isClockwise) {
 
-	var unitDegree;
-	if (isClockwise) {
-		unitDegree = 1;
-	} else {
-		unitDegree = -1;
-	}
+  var unitDegree;
+  if (isClockwise) {
+    unitDegree = 1;
+  } else {
+    unitDegree = -1;
+  }
 
-	if (degrees > 0) {
-		var cubelet = cubelets[i][j][k];
+  if (degrees > 0) {
+    var cubelet = cubelets[i][j][k];
 
-		var element = document.getElementById(cubelet.id);
+    var element = document.getElementById(cubelet.id);
 
-		var newTransformStr = addDegrees(cubelet.transform, dimension, unitDegree);
+    var newTransformStr = addDegrees(cubelet.transform, dimension, unitDegree);
 
-		cubelet.transform = newTransformStr;
+    cubelet.transform = newTransformStr;
 
-		element.offsetHeight;
-		element.style.transform = newTransformStr;
+    element.offsetHeight;
+    element.style.transform = newTransformStr;
 
-		setTimeout(function (){
-			visualRotateCubelet(i, j, k, dimension, degrees - 1, isClockwise)
-		}, CUBELET_DELAY_MS);
-	}
+    setTimeout(function (){
+      visualRotateCubelet(i, j, k, dimension, degrees - 1, isClockwise)
+    }, CUBELET_DELAY_MS);
+  }
 }
 
 /*extracts the rotate property of the corresponding dimension in a
 transform string, and shifts it by the new angle*/
 function addDegrees(transformStr, dimension, degrees) {
-	var rotateProperty = "rotate" + dimension;
+  var rotateProperty = "rotate" + dimension;
 
     var startIndex = transformStr.indexOf(rotateProperty);
 
-	if (startIndex === -1) {
-		//rotate property for the dimension has not been assigned before
-		transformStr = rotateProperty + "(" + degrees + "deg) " + transformStr;
-	} else {
-		var endIndex = startIndex + 8;
-		var currentAngle = "";
-		var negative = false;
-		if (transformStr[endIndex] === '-') {
-			negative = true;
-			endIndex++;
-		}
-		while ('0' <= transformStr[endIndex] && transformStr[endIndex] <= '9') {
-			currentAngle += transformStr[endIndex];
-			endIndex++;
-		}
-		currentAngle = parseInt(currentAngle);
+  if (startIndex === -1) {
+    //rotate property for the dimension has not been assigned before
+    transformStr = rotateProperty + "(" + degrees + "deg) " + transformStr;
+  } else {
+    var endIndex = startIndex + 8;
+    var currentAngle = "";
+    var negative = false;
+    if (transformStr[endIndex] === '-') {
+      negative = true;
+      endIndex++;
+    }
+    while ('0' <= transformStr[endIndex] && transformStr[endIndex] <= '9') {
+      currentAngle += transformStr[endIndex];
+      endIndex++;
+    }
+    currentAngle = parseInt(currentAngle);
 
-		if (negative) {
-			currentAngle = -currentAngle;
-		}
+    if (negative) {
+      currentAngle = -currentAngle;
+    }
 
-		transformStr = transformStr.substring(0,startIndex) + 
-		rotateProperty + "(" + (currentAngle + degrees) + "deg)" +
-		transformStr.substring(endIndex+4);
-	}
-	return transformStr;
+    transformStr = transformStr.substring(0,startIndex) + 
+    rotateProperty + "(" + (currentAngle + degrees) + "deg)" +
+    transformStr.substring(endIndex+4);
+  }
+  return transformStr;
 }
 
 //all functions that start with "array" change the cubelet positions
@@ -321,7 +367,7 @@ function addDegrees(transformStr, dimension, degrees) {
 
 /** Replaces a row on a face of the cube using data from another row/column */
 function arrayShiftRow(faceId, rowId, a, b, c){
-	var a2 = new Cubelet(), b2 = new Cubelet(), c2 = new Cubelet();
+  var a2 = new Cubelet(), b2 = new Cubelet(), c2 = new Cubelet();
 
     createDeepCopy(a2, cubelets[faceId][rowId][0]);
     createDeepCopy(b2, cubelets[faceId][rowId][1]);
@@ -389,7 +435,7 @@ function arrayShiftColReverse(faceId, colId, a, b, c){
 
 /** Rotates the squares on a given face on the Rubiks Cube clockwise. */
 function arrayRotateFaceClockwise(face) {
-	var faceId = faceToId[face];
+  var faceId = faceToId[face];
     var temp, temp2;
     
     // corners
@@ -421,7 +467,7 @@ function arrayRotateFaceClockwise(face) {
 
 /** Rotates the squares on a given face on the Rubiks Cube anticlockwise. */
 function arrayRotateFaceAntiClockwise(face) {
-	var faceId = faceToId[face];
+  var faceId = faceToId[face];
     var temp, temp2;
     
     // corners
@@ -455,12 +501,10 @@ function arrayRotateFaceAntiClockwise(face) {
 // The following functions update the cube to reflect a one quarter rotation
 // on the specified face in the specified direction.
 // s1, s2, s3 are the first, second and third cubelets in the row
-
 function arrayRotateFrontClockwise() {
     arrayRotateFaceClockwise("F");
     
     var s1 = cubelets[3][2][0], s2 = cubelets[3][2][1], s3 = cubelets[3][2][2];
-    
     arrayShiftCol (2, 0, s1, s2, s3);
     arrayShiftRowReverse(4, 0, s1, s2, s3);
     arrayShiftCol(1, 2, s1, s2, s3);
@@ -595,8 +639,6 @@ function arrayRotateBackAntiClockwise(){
 }
 
 function createDeepCopy(cubelet1, cubelet2) {
-	cubelet1 = {
-		id : cubelet2.id,
-		transform : cubelet2.transform,
-	};
+  cubelet1.id = cubelet2.id;
+  cubelet1.transform = cubelet2.transform;
 }
