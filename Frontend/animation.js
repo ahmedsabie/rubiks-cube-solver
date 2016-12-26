@@ -1,5 +1,8 @@
-//Faces : 0 = Front, 1 = Left, 2 = Right, 3 = Up, 4 = Down, 5 = Back
+//Note that a cubelet refers to one side (one color) of a single cube in the rubiks cube
 
+//Faces : 0 = Front, 1 = Left, 2 = Right, 3 = Up, 4 = Down, 5 = Back
+//Rows : 0 = Top, 1 = Middle, 2 = Bottom
+//Cols : 0 = Left, 1 = Middle, 2 = Right
 faces = ["front", "left", "right", "up", "down", "back"];
 rows = ["top", "middle", "bottom"];
 cols = ["left", "middle", "right"];
@@ -9,159 +12,250 @@ faceToId = {"F" : 0, "L" : 1, "R" : 2, "U" : 3, "D" : 4, "B" : 5};
 rowToId = {"T" : 0, "M" : 1, "B" : 2};
 colToId = {"L" : 0, "M" : 1, "R" : 2};
 
+//The initial orientation of each face
 faceRotations = ["rotateY(0deg)", "rotateY(-90deg)", "rotateY(90deg)", "rotateX(90deg)", "rotateX(-90deg)", "rotateY(180deg)"];
 
-//a cubelet in the 2 following 3D arrays is accessed as [face][row][col]
-cubeletIds = [];
-cubeletTransformStrs = [];
+//The delay in milliseconds for a 1 degree rotation in a cubelet to occur
+CUBELET_DELAY_MS = 8;
 
-setUpCubeletInfo();
-assignTransformStrs();
+//constructors for the Cubelet class
+
+//id is the html id of the cubelet, and transform is the current transformation style string 
+//of the cubelet
+function Cubelet() {
+	this.id = null;
+	this.transform = null;
+}
+function Cubelet(id, transformStr) {
+	this.id = id;
+	this.transform = transformStr;
+}
+
+//cubelets will be stored in this 3D array, with the 3 indices representing face, row, and col respectively
+cubelets = [];
+
+function main() {
+	setUpCubeletInfo();
+	assignTransformStrs();
+}
 
 
+main();
 
 /*generates the styles.css cubelet ids, and their default transforms
 
-the transform strings are stored in javascript rather than accessed
-with getComputedStyle as the latter returns the matrix3d representation, 
-rather than the rotates and translates only of the CSS*/
+the transform strings are stored in javascript rather than being accessed
+by getComputedStyle as the latter returns the matrix3d representation, 
+which is difficult to work with */
 
 function setUpCubeletInfo() {
 	var translateZ = 150;
 
 	for (var i = 0; i < faces.length; i++) {
-		var faceIds = [];
-		var faceStrs = [];
+		var faceCubelets = [];
 		var translateY = 0;
 		for (var j = 0; j < rows.length; j++) {
-			var rowIds = [];
-			var rowStrs = [];
+			var rowCubelets = [];
 			var translateX = 0;
 			for (var k = 0; k < cols.length; k++) {
 				var cubeletId = faces[i] + "-face-" + rows[j] + "-row-" + cols[k] + "-col";
-				rowIds.push(cubeletId);
-
 				var transformStr = faceRotations[i] + " translate3d(" + translateX + "px, " + translateY + "px, " + translateZ + "px)";
-				rowStrs.push(transformStr);
+
+				var cubelet = new Cubelet(cubeletId, transformStr);
+
+				rowCubelets.push(cubelet);
 
 				translateX += 100;
 			}
-			faceIds.push(rowIds);
-			faceStrs.push(rowStrs)
+			faceCubelets.push(rowCubelets);
 
 			translateY += 100;
 		}
-		cubeletIds.push(faceIds);
-		cubeletTransformStrs.push(faceStrs);
+		cubelets.push(faceCubelets);
 	}
 }
 
 function assignTransformStrs() {
-	for (var i = 0; i < cubeletIds.length; i++) {
-		for (var j = 0; j < cubeletIds[i].length; j++) {
-			for (var k = 0; k < cubeletIds[i][j].length; k++) {
-				var element = document.getElementById(cubeletIds[i][j][k]);
-				element.style.transform = cubeletTransformStrs[i][j][k];
+	for (var i = 0; i < cubelets.length; i++) {
+		for (var j = 0; j < cubelets[i].length; j++) {
+			for (var k = 0; k < cubelets[i][j].length; k++) {
+				var element = document.getElementById(cubelets[i][j][k].id);
+				element.style.transform = cubelets[i][j][k].transform;
 			}
 		}
 	}
 }
 
 function rotateFrontFace(isClockwise) {
-	rotateFace("F", "Z", isClockwise);
+	visualRotateFrontFace(isClockwise);
 
-	rotateRow("U", "B", "Z", isClockwise);
-	rotateRow("D", "T", "Z", isClockwise);
-	rotateCol("L", "R", "Z", isClockwise);
-	rotateCol("R", "L", "Z", isClockwise);
-
+	if (isClockwise) {
+		arrayRotateFrontClockwise();
+	} else {
+		arrayRotateFrontAntiClockwise();
+	}
 }
 
 function rotateBackFace(isClockwise) {
 	isClockwise = !isClockwise;
-	rotateFace("B", "Z", isClockwise);
 
-	rotateRow("U", "T", "Z", isClockwise);
-	rotateRow("D", "B", "Z", isClockwise);
-	rotateCol("L", "L", "Z", isClockwise);
-	rotateCol("R", "R", "Z", isClockwise);
+	visualRotateBackFace(isClockwise);
 
+	if (isClockwise) {
+		arrayRotateBackClockwise();
+	} else {
+		arrayRotateBackAntiClockwise();
+	}
+}
+
+function rotateBackFace(isClockwise) {
+	isClockwise = !isClockwise;
+
+	visualRotateBackFace(isClockwise);
+
+	if (isClockwise) {
+		arrayRotateBackClockwise();
+	} else {
+		arrayRotateBackAntiClockwise();
+	}
 }
 
 function rotateLeftFace(isClockwise) {
 	isClockwise = !isClockwise;
-	rotateFace("L", "X", isClockwise);
 
-	rotateCol("U", "L", "X", isClockwise);
-	rotateCol("B", "R", "X", isClockwise);
-	rotateCol("D", "L", "X", isClockwise);
-	rotateCol("F", "L", "X", isClockwise);
+	visualRotateLeftFace(isClockwise);
+
+	if (isClockwise) {
+		arrayRotateLeftClockwise();
+	} else {
+		arrayRotateLeftAntiClockwise();
+	}
 
 }
 
 function rotateRightFace(isClockwise) {
-	rotateFace("R", "X", isClockwise);
+	visualRotateRightFace(isClockwise);
 
-	rotateCol("U", "R", "X", isClockwise);
-	rotateCol("B", "L", "X", isClockwise);
-	rotateCol("D", "R", "X", isClockwise);
-	rotateCol("F", "R", "X", isClockwise);
+	if (isClockwise) {
+		arrayRotateRightClockwise();
+	} else {
+		arrayRotateRightAntiClockwise();
+	}
 
 }
 
 function rotateUpFace(isClockwise) {
 	isClockwise = !isClockwise;
-	rotateFace("U", "Y", isClockwise);
 
-	rotateRow("L", "T", "Y", isClockwise);
-	rotateRow("F", "T", "Y", isClockwise);
-	rotateRow("R", "T", "Y", isClockwise);
-	rotateRow("B", "T", "Y", isClockwise);
+	visualRotateUpFace(isClockwise);
+
+	if (isClockwise) {
+		arrayRotateUpClockwise();
+	} else {
+		arrayRotateUpAntiClockwise();
+	}
 
 }
 
 function rotateDownFace(isClockwise) {
-	rotateFace("D", "Y", isClockwise);
+	visualRotateDownFace(isClockwise);
 
-	rotateRow("L", "B", "Y", isClockwise);
-	rotateRow("F", "B", "Y", isClockwise);
-	rotateRow("R", "B", "Y", isClockwise);
-	rotateRow("B", "B", "Y", isClockwise);
+	if (isClockwise) {
+		arrayRotateDownClockwise();
+	} else {
+		arrayRotateDownAntiClockwise();
+	}
 
+}
+//all functions that start with "visual" change the cube's CSS code
+
+function visualRotateFrontFace(isClockwise) {
+	visualRotateFace("F", "Z", isClockwise);
+
+	visualRotateRow("U", "B", "Z", isClockwise);
+	visualRotateRow("D", "T", "Z", isClockwise);
+	visualRotateCol("L", "R", "Z", isClockwise);
+	visualRotateCol("R", "L", "Z", isClockwise);
+}
+
+function visualRotateBackFace(isClockwise) {
+	visualRotateFace("B", "Z", isClockwise);
+
+	visualRotateRow("U", "T", "Z", isClockwise);
+	visualRotateRow("D", "B", "Z", isClockwise);
+	visualRotateCol("L", "L", "Z", isClockwise);
+	visualRotateCol("R", "R", "Z", isClockwise);
+}
+
+function visualRotateLeftFace(isClockwise) {
+	visualRotateFace("L", "X", isClockwise);
+
+	visualRotateCol("U", "L", "X", isClockwise);
+	visualRotateCol("B", "R", "X", isClockwise);
+	visualRotateCol("D", "L", "X", isClockwise);
+	visualRotateCol("F", "L", "X", isClockwise);
+}
+
+function visualRotateRightFace(isClockwise) {
+	visualRotateFace("R", "X", isClockwise);
+
+	visualRotateCol("U", "R", "X", isClockwise);
+	visualRotateCol("B", "L", "X", isClockwise);
+	visualRotateCol("D", "R", "X", isClockwise);
+	visualRotateCol("F", "R", "X", isClockwise);
+}
+
+function visualRotateUpFace(isClockwise) {
+	visualRotateFace("U", "Y", isClockwise);
+
+	visualRotateRow("L", "T", "Y", isClockwise);
+	visualRotateRow("F", "T", "Y", isClockwise);
+	visualRotateRow("R", "T", "Y", isClockwise);
+	visualRotateRow("B", "T", "Y", isClockwise);
+}
+
+function visualRotateDownFace(isClockwise) {
+	visualRotateFace("D", "Y", isClockwise);
+
+	visualRotateRow("L", "B", "Y", isClockwise);
+	visualRotateRow("F", "B", "Y", isClockwise);
+	visualRotateRow("R", "B", "Y", isClockwise);
+	visualRotateRow("B", "B", "Y", isClockwise);
 }
 
 /*dimension in all the following functions must be given as
 "X", "Y", or "Z" */
 
-function rotateFace(face, dimension, isClockwise) {
+function visualRotateFace(face, dimension, isClockwise) {
 	var faceId = faceToId[face];
-	for (var i = 0; i < cubeletIds[faceId].length; i++) {
-		for (var j = 0; j < cubeletIds[faceId][i].length; j++) {
-			rotateCubelet(faceId, i, j, dimension, 90, isClockwise);
+	for (var i = 0; i < cubelets[faceId].length; i++) {
+		for (var j = 0; j < cubelets[faceId][i].length; j++) {
+			visualRotateCubelet(faceId, i, j, dimension, 90, isClockwise);
 		}
 	}
 }
 
-function rotateRow(face, row, dimension, isClockwise) {
+function visualRotateRow(face, row, dimension, isClockwise) {
 	var faceId = faceToId[face];
 	var rowId = rowToId[row];
-	for (var i = 0; i < cubeletIds[faceId][rowId].length; i++) {
-		rotateCubelet(faceId, rowId, i, dimension, 90, isClockwise);
+	for (var i = 0; i < cubelets[faceId][rowId].length; i++) {
+		visualRotateCubelet(faceId, rowId, i, dimension, 90, isClockwise);
 	}
 }
 
-function rotateCol(face, col, dimension, isClockwise) {
+function visualRotateCol(face, col, dimension, isClockwise) {
 	var faceId = faceToId[face];
 	var colId = colToId[col];
-	for (var i = 0; i < cubeletIds[faceId].length; i++) {
-		rotateCubelet(faceId, i, colId, dimension, 90, isClockwise);
+	for (var i = 0; i < cubelets[faceId].length; i++) {
+		visualRotateCubelet(faceId, i, colId, dimension, 90, isClockwise);
 	}
 }
 
 /*rotates the cubelet with face id i, row id j, and col id k,
 across the dimension*/
 
-function rotateCubelet(i, j, k, dimension, degrees, isClockwise) {
+function visualRotateCubelet(i, j, k, dimension, degrees, isClockwise) {
+
 	var unitDegree;
 	if (isClockwise) {
 		unitDegree = 1;
@@ -170,18 +264,20 @@ function rotateCubelet(i, j, k, dimension, degrees, isClockwise) {
 	}
 
 	if (degrees > 0) {
-		var element = document.getElementById(cubeletIds[i][j][k]);
+		var cubelet = cubelets[i][j][k];
 
-		var newTransformStr = addDegrees(cubeletTransformStrs[i][j][k], dimension, unitDegree);
+		var element = document.getElementById(cubelet.id);
 
-		cubeletTransformStrs[i][j][k] = newTransformStr;
+		var newTransformStr = addDegrees(cubelet.transform, dimension, unitDegree);
+
+		cubelet.transform = newTransformStr;
 
 		element.offsetHeight;
 		element.style.transform = newTransformStr;
 
 		setTimeout(function (){
-			rotateCubelet(i, j, k, dimension, degrees - 1, isClockwise)
-		}, 10);
+			visualRotateCubelet(i, j, k, dimension, degrees - 1, isClockwise)
+		}, CUBELET_DELAY_MS);
 	}
 }
 
@@ -218,4 +314,289 @@ function addDegrees(transformStr, dimension, degrees) {
 		transformStr.substring(endIndex+4);
 	}
 	return transformStr;
+}
+
+//all functions that start with "array" change the cubelet positions
+//in our cubelet array. They are all adapted from the C++ backend code
+
+/** Replaces a row on a face of the cube using data from another row/column */
+function arrayShiftRow(faceId, rowId, a, b, c){
+	var a2 = new Cubelet(), b2 = new Cubelet(), c2 = new Cubelet();
+
+    createDeepCopy(a2, cubelets[faceId][rowId][0]);
+    createDeepCopy(b2, cubelets[faceId][rowId][1]);
+    createDeepCopy(c2, cubelets[faceId][rowId][2]);
+    
+    createDeepCopy(cubelets[faceId][rowId][0], a);
+    createDeepCopy(cubelets[faceId][rowId][1], b);
+    createDeepCopy(cubelets[faceId][rowId][2], c);
+
+    createDeepCopy(a, a2);
+    createDeepCopy(b, b2);
+    createDeepCopy(c, c2);
+}
+
+/** Replaces a row on a face of the cube using data from another row/column in reverse order */
+function arrayShiftRowReverse(faceId, rowId, a, b, c){
+    var a2 = new Cubelet(), b2 = new Cubelet(), c2 = new Cubelet();
+
+    createDeepCopy(a2, cubelets[faceId][rowId][0]);
+    createDeepCopy(b2, cubelets[faceId][rowId][1]);
+    createDeepCopy(c2, cubelets[faceId][rowId][2]);
+    
+    createDeepCopy(cubelets[faceId][rowId][0], c);
+    createDeepCopy(cubelets[faceId][rowId][1], b);
+    createDeepCopy(cubelets[faceId][rowId][2], a);
+
+    createDeepCopy(a, a2);
+    createDeepCopy(b, b2);
+    createDeepCopy(c, c2);
+}
+
+/** Replaces a column on a face of the cube using data from another row/column */
+function arrayShiftCol(faceId, colId, a, b, c){
+    var a2 = new Cubelet(), b2 = new Cubelet(), c2 = new Cubelet();
+
+    createDeepCopy(a2, cubelets[faceId][0][colId]);
+    createDeepCopy(b2, cubelets[faceId][1][colId]);
+    createDeepCopy(c2, cubelets[faceId][2][colId]);
+    
+    createDeepCopy(cubelets[faceId][0][colId], a);
+    createDeepCopy(cubelets[faceId][1][colId], b);
+    createDeepCopy(cubelets[faceId][2][colId], c);
+
+    createDeepCopy(a, a2);
+    createDeepCopy(b, b2);
+    createDeepCopy(c, c2);
+}
+
+/** Replaces a column on a face of the cube using data from another row/column in reverse order */
+function arrayShiftColReverse(faceId, colId, a, b, c){
+    var a2 = new Cubelet(), b2 = new Cubelet(), c2 = new Cubelet();
+
+    createDeepCopy(a2, cubelets[faceId][0][colId]);
+    createDeepCopy(b2, cubelets[faceId][1][colId]);
+    createDeepCopy(c2, cubelets[faceId][2][colId]);
+    
+    createDeepCopy(cubelets[faceId][0][colId], c);
+    createDeepCopy(cubelets[faceId][1][colId], b);
+    createDeepCopy(cubelets[faceId][2][colId], a);
+
+    createDeepCopy(a, a2);
+    createDeepCopy(b, b2);
+    createDeepCopy(c, c2);
+}
+
+/** Rotates the squares on a given face on the Rubiks Cube clockwise. */
+function arrayRotateFaceClockwise(face) {
+	var faceId = faceToId[face];
+    var temp, temp2;
+    
+    // corners
+    temp = cubelets[faceId][0][0];
+    cubelets[faceId][0][0] = cubelets[faceId][2][0];
+    
+    temp2 = cubelets[faceId][0][2];
+    cubelets[faceId][0][2] = temp;
+    
+    temp = cubelets[faceId][2][2];
+    cubelets[faceId][2][2] = temp2;
+    
+    cubelets[faceId][2][0] = temp;
+    
+    
+    // edges
+    temp = cubelets[faceId][0][1];
+    cubelets[faceId][0][1] = cubelets[faceId][1][0];
+    
+    temp2 = cubelets[faceId][1][2];
+    cubelets[faceId][1][2] = temp;
+    
+    temp = cubelets[faceId][2][1];
+    cubelets[faceId][2][1] = temp2;
+    
+    cubelets[faceId][1][0] = temp;
+    
+}
+
+/** Rotates the squares on a given face on the Rubiks Cube anticlockwise. */
+function arrayRotateFaceAntiClockwise(face) {
+	var faceId = faceToId[face];
+    var temp, temp2;
+    
+    // corners
+    temp = cubelets[faceId][0][0];
+    cubelets[faceId][0][0] = cubelets[faceId][0][2];
+    
+    temp2 = cubelets[faceId][2][0];
+    cubelets[faceId][2][0] = temp;
+    
+    temp = cubelets[faceId][2][2];
+    cubelets[faceId][2][2] = temp2;
+    
+    cubelets[faceId][0][2] = temp;
+    
+    
+    // edges
+    temp = cubelets[faceId][0][1];
+    cubelets[faceId][0][1] = cubelets[faceId][1][2];
+    
+    temp2 = cubelets[faceId][1][0];
+    cubelets[faceId][1][0] = temp;
+    
+    temp = cubelets[faceId][2][1];
+    cubelets[faceId][2][1] = temp2;
+    
+    cubelets[faceId][1][2] = temp;
+    
+}
+
+
+// The following functions update the cube to reflect a one quarter rotation
+// on the specified face in the specified direction.
+// s1, s2, s3 are the first, second and third cubelets in the row
+
+function arrayRotateFrontClockwise() {
+    arrayRotateFaceClockwise("F");
+    
+    var s1 = cubelets[3][2][0], s2 = cubelets[3][2][1], s3 = cubelets[3][2][2];
+    
+    arrayShiftCol (2, 0, s1, s2, s3);
+    arrayShiftRowReverse(4, 0, s1, s2, s3);
+    arrayShiftCol(1, 2, s1, s2, s3);
+    arrayShiftRowReverse(3, 2, s1, s2, s3);
+
+}
+
+function arrayRotateFrontAntiClockwise(){
+    arrayRotateFaceAntiClockwise("F");
+    
+    var s1 = cubelets[3][2][0], s2 = cubelets[3][2][1], s3 = cubelets[3][2][2];
+    
+    arrayShiftColReverse(1, 2, s1, s2, s3);
+    arrayShiftRow(4, 0, s1, s2, s3);
+    arrayShiftColReverse (2, 0, s1, s2, s3);
+    arrayShiftRow(3, 2, s1, s2, s3);
+    
+}
+
+function arrayRotateLeftClockwise(){
+    arrayRotateFaceClockwise("L");
+    
+    var s1 = cubelets[3][0][0], s2 = cubelets[3][1][0], s3 = cubelets[3][2][0];
+    
+    arrayShiftCol (0, 0, s1, s2, s3);
+    arrayShiftCol(4, 0, s1, s2, s3);
+    arrayShiftColReverse(5, 2, s1, s2, s3);
+    arrayShiftColReverse(3, 0, s1, s2, s3);
+}
+
+function arrayRotateLeftAntiClockwise(){
+    arrayRotateFaceAntiClockwise("L");
+    
+    var s1 = cubelets[3][0][0], s2 = cubelets[3][1][0], s3 = cubelets[3][2][0];
+    
+    arrayShiftColReverse(5, 2, s1, s2, s3);
+    arrayShiftColReverse(4, 0, s1, s2, s3);
+    arrayShiftCol (0, 0, s1, s2, s3);
+    arrayShiftCol(3, 0, s1, s2, s3);
+    
+}
+
+function arrayRotateRightClockwise(){
+    arrayRotateFaceClockwise("R");
+    
+    var s1 = cubelets[3][0][2], s2 = cubelets[3][1][2], s3 = cubelets[3][2][2];
+    
+    arrayShiftColReverse(5, 0, s1, s2, s3);
+    arrayShiftColReverse(4, 2, s1, s2, s3);
+    arrayShiftCol (0, 2, s1, s2, s3);
+    arrayShiftCol(3, 2, s1, s2, s3);
+    
+}
+
+function arrayRotateRightAntiClockwise(){
+    arrayRotateFaceAntiClockwise("R");
+    
+    var s1 = cubelets[3][0][2], s2 = cubelets[3][1][2], s3 = cubelets[3][2][2];
+    
+    arrayShiftCol (0, 2, s1, s2, s3);
+    arrayShiftCol(4, 2, s1, s2, s3);
+    arrayShiftColReverse(5, 0, s1, s2, s3);
+    arrayShiftColReverse(3, 2, s1, s2, s3);
+    
+}
+
+function arrayRotateUpClockwise(){
+    arrayRotateFaceClockwise("U");
+    
+    var s1 = cubelets[5][0][0], s2 = cubelets[5][0][1], s3 = cubelets[5][0][2];
+
+    arrayShiftRow(2, 0, s1, s2, s3);
+    arrayShiftRow(0, 0, s1, s2, s3);
+    arrayShiftRow (1, 0, s1, s2, s3);
+    arrayShiftRow(5, 0, s1, s2, s3);
+    
+}
+
+function arrayRotateUpAntiClockwise(){
+    arrayRotateFaceAntiClockwise("U");
+    
+    var s1 = cubelets[5][0][0], s2 = cubelets[5][0][1], s3 = cubelets[5][0][2];
+
+    arrayShiftRow(1, 0, s1, s2, s3);
+    arrayShiftRow(0, 0, s1, s2, s3);
+    arrayShiftRow (2, 0, s1, s2, s3);
+    arrayShiftRow(5, 0, s1, s2, s3);
+}
+
+function arrayRotateDownClockwise(){
+    arrayRotateFaceClockwise("D");
+    
+    var s1 = cubelets[5][2][0], s2 = cubelets[5][2][1], s3 = cubelets[5][2][2];
+
+    arrayShiftRow(1, 2, s1, s2, s3);
+    arrayShiftRow(0, 2, s1, s2, s3);
+    arrayShiftRow (2, 2, s1, s2, s3);
+    arrayShiftRow(5, 2, s1, s2, s3);
+}
+
+function arrayRotateDownAntiClockwise(){
+    arrayRotateFaceAntiClockwise("D");
+    
+    var s1 = cubelets[5][2][0], s2 = cubelets[5][2][1], s3 = cubelets[5][2][2];
+
+    arrayShiftRow(2, 2, s1, s2, s3);
+    arrayShiftRow(0, 2, s1, s2, s3);
+    arrayShiftRow (1, 2, s1, s2, s3);
+    arrayShiftRow(5, 2, s1, s2, s3);
+}
+
+function arrayRotateBackClockwise(){
+    arrayRotateFaceClockwise("B");
+    
+    var s1 = cubelets[3][0][0], s2 = cubelets[3][0][1], s3 = cubelets[3][0][2];
+
+    arrayShiftCol(1, 0, s1, s2, s3);
+    arrayShiftRow(4, 2, s1, s2, s3);
+    arrayShiftColReverse(2, 2, s1, s2, s3);
+    arrayShiftRowReverse(3, 0, s1, s2, s3);
+}
+
+function arrayRotateBackAntiClockwise(){
+    arrayRotateFaceAntiClockwise("B");
+    
+    var s1 = cubelets[3][0][0], s2 = cubelets[3][0][1], s3 = cubelets[3][0][2];
+    
+    arrayShiftColReverse(2, 2, s1, s2, s3);
+    arrayShiftRowReverse(4, 2, s1, s2, s3);
+    arrayShiftCol(1, 0, s1, s2, s3);
+    arrayShiftRow(3, 0, s1, s2, s3);
+}
+
+function createDeepCopy(cubelet1, cubelet2) {
+	cubelet1 = {
+		id : cubelet2.id,
+		transform : cubelet2.transform,
+	};
 }
