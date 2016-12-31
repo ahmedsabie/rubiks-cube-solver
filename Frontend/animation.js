@@ -129,9 +129,7 @@ function rotateFrontFace(isClockwise) {
 }
 
 function rotateBackFace(isClockwise) {
-  isClockwise = !isClockwise;
-
-  visualRotateBackFace(isClockwise);
+  visualRotateBackFace(!isClockwise);
 
   //update the array after animation is done, hence the delay 
   setTimeout(function(){ 
@@ -146,9 +144,7 @@ function rotateBackFace(isClockwise) {
 }
 
 function rotateLeftFace(isClockwise) {
-  isClockwise = !isClockwise;
-
-  visualRotateLeftFace(isClockwise);
+  visualRotateLeftFace(!isClockwise);
 
   //update the array after animation is done, hence the delay 
   setTimeout(function(){ 
@@ -180,9 +176,7 @@ function rotateRightFace(isClockwise) {
 }
 
 function rotateUpFace(isClockwise) {
-  isClockwise = !isClockwise;
-
-  visualRotateUpFace(isClockwise);
+  visualRotateUpFace(!isClockwise);
 
   //update the array after animation is done, hence the delay 
   setTimeout(function(){ 
