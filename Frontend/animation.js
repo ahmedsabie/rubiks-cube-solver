@@ -572,7 +572,12 @@ function arrayRotateFaceAntiClockwise(face) {
 function arrayRotateFrontClockwise() {
     arrayRotateFaceClockwise("F");
     
-    var s1 = cubelets[3][2][0], s2 = cubelets[3][2][1], s3 = cubelets[3][2][2];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[3][2][0]);
+    createDeepCopy(s2, cubelets[3][2][1]);
+    createDeepCopy(s3, cubelets[3][2][2]);
+
     arrayShiftCol (2, 0, s1, s2, s3);
     arrayShiftRowReverse(4, 0, s1, s2, s3);
     arrayShiftCol(1, 2, s1, s2, s3);
@@ -583,7 +588,11 @@ function arrayRotateFrontClockwise() {
 function arrayRotateFrontAntiClockwise(){
     arrayRotateFaceAntiClockwise("F");
     
-    var s1 = cubelets[3][2][0], s2 = cubelets[3][2][1], s3 = cubelets[3][2][2];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[3][2][0]);
+    createDeepCopy(s2, cubelets[3][2][1]);
+    createDeepCopy(s3, cubelets[3][2][2]);
     
     arrayShiftColReverse(1, 2, s1, s2, s3);
     arrayShiftRow(4, 0, s1, s2, s3);
@@ -595,7 +604,11 @@ function arrayRotateFrontAntiClockwise(){
 function arrayRotateLeftClockwise(){
     arrayRotateFaceClockwise("L");
     
-    var s1 = cubelets[3][0][0], s2 = cubelets[3][1][0], s3 = cubelets[3][2][0];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[3][0][0]);
+    createDeepCopy(s2, cubelets[3][1][0]);
+    createDeepCopy(s3, cubelets[3][2][0]);
     
     arrayShiftCol (0, 0, s1, s2, s3);
     arrayShiftCol(4, 0, s1, s2, s3);
@@ -606,7 +619,11 @@ function arrayRotateLeftClockwise(){
 function arrayRotateLeftAntiClockwise(){
     arrayRotateFaceAntiClockwise("L");
     
-    var s1 = cubelets[3][0][0], s2 = cubelets[3][1][0], s3 = cubelets[3][2][0];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[3][0][0]);
+    createDeepCopy(s2, cubelets[3][1][0]);
+    createDeepCopy(s3, cubelets[3][2][0]);
     
     arrayShiftColReverse(5, 2, s1, s2, s3);
     arrayShiftColReverse(4, 0, s1, s2, s3);
@@ -618,7 +635,11 @@ function arrayRotateLeftAntiClockwise(){
 function arrayRotateRightClockwise(){
     arrayRotateFaceClockwise("R");
     
-    var s1 = cubelets[3][0][2], s2 = cubelets[3][1][2], s3 = cubelets[3][2][2];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[3][0][2]);
+    createDeepCopy(s2, cubelets[3][1][2]);
+    createDeepCopy(s3, cubelets[3][2][2]);
     
     arrayShiftColReverse(5, 0, s1, s2, s3);
     arrayShiftColReverse(4, 2, s1, s2, s3);
@@ -630,7 +651,11 @@ function arrayRotateRightClockwise(){
 function arrayRotateRightAntiClockwise(){
     arrayRotateFaceAntiClockwise("R");
     
-    var s1 = cubelets[3][0][2], s2 = cubelets[3][1][2], s3 = cubelets[3][2][2];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[3][0][2]);
+    createDeepCopy(s2, cubelets[3][1][2]);
+    createDeepCopy(s3, cubelets[3][2][2]);
     
     arrayShiftCol (0, 2, s1, s2, s3);
     arrayShiftCol(4, 2, s1, s2, s3);
@@ -642,7 +667,11 @@ function arrayRotateRightAntiClockwise(){
 function arrayRotateUpClockwise(){
     arrayRotateFaceClockwise("U");
     
-    var s1 = cubelets[5][0][0], s2 = cubelets[5][0][1], s3 = cubelets[5][0][2];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[5][0][0]);
+    createDeepCopy(s2, cubelets[5][0][1]);
+    createDeepCopy(s3, cubelets[5][0][2]);
 
     arrayShiftRow(2, 0, s1, s2, s3);
     arrayShiftRow(0, 0, s1, s2, s3);
@@ -654,7 +683,11 @@ function arrayRotateUpClockwise(){
 function arrayRotateUpAntiClockwise(){
     arrayRotateFaceAntiClockwise("U");
     
-    var s1 = cubelets[5][0][0], s2 = cubelets[5][0][1], s3 = cubelets[5][0][2];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[5][0][0]);
+    createDeepCopy(s2, cubelets[5][0][1]);
+    createDeepCopy(s3, cubelets[5][0][2]);
 
     arrayShiftRow(1, 0, s1, s2, s3);
     arrayShiftRow(0, 0, s1, s2, s3);
@@ -665,7 +698,11 @@ function arrayRotateUpAntiClockwise(){
 function arrayRotateDownClockwise(){
     arrayRotateFaceClockwise("D");
     
-    var s1 = cubelets[5][2][0], s2 = cubelets[5][2][1], s3 = cubelets[5][2][2];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[5][2][0]);
+    createDeepCopy(s2, cubelets[5][2][1]);
+    createDeepCopy(s3, cubelets[5][2][2]);
 
     arrayShiftRow(1, 2, s1, s2, s3);
     arrayShiftRow(0, 2, s1, s2, s3);
@@ -676,7 +713,11 @@ function arrayRotateDownClockwise(){
 function arrayRotateDownAntiClockwise(){
     arrayRotateFaceAntiClockwise("D");
     
-    var s1 = cubelets[5][2][0], s2 = cubelets[5][2][1], s3 = cubelets[5][2][2];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[5][2][0]);
+    createDeepCopy(s2, cubelets[5][2][1]);
+    createDeepCopy(s3, cubelets[5][2][2]);
 
     arrayShiftRow(2, 2, s1, s2, s3);
     arrayShiftRow(0, 2, s1, s2, s3);
@@ -687,23 +728,31 @@ function arrayRotateDownAntiClockwise(){
 function arrayRotateBackClockwise(){
     arrayRotateFaceClockwise("B");
     
-    var s1 = cubelets[3][0][0], s2 = cubelets[3][0][1], s3 = cubelets[3][0][2];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[3][0][0]);
+    createDeepCopy(s2, cubelets[3][0][1]);
+    createDeepCopy(s3, cubelets[3][0][2]);
 
     arrayShiftCol(1, 0, s1, s2, s3);
-    arrayShiftRow(4, 2, s1, s2, s3);
+    arrayShiftRowReverse(4, 2, s1, s2, s3);
     arrayShiftColReverse(2, 2, s1, s2, s3);
-    arrayShiftRowReverse(3, 0, s1, s2, s3);
+    arrayShiftRow(3, 0, s1, s2, s3);
 }
 
 function arrayRotateBackAntiClockwise(){
     arrayRotateFaceAntiClockwise("B");
     
-    var s1 = cubelets[3][0][0], s2 = cubelets[3][0][1], s3 = cubelets[3][0][2];
+    var s1 = new Cubelet(), s2 = new Cubelet(), s3 = new Cubelet();
+
+    createDeepCopy(s1, cubelets[3][0][0]);
+    createDeepCopy(s2, cubelets[3][0][1]);
+    createDeepCopy(s3, cubelets[3][0][2]);
     
-    arrayShiftColReverse(2, 2, s1, s2, s3);
-    arrayShiftRowReverse(4, 2, s1, s2, s3);
-    arrayShiftCol(1, 0, s1, s2, s3);
-    arrayShiftRow(3, 0, s1, s2, s3);
+    arrayShiftCol(2, 2, s1, s2, s3);
+    arrayShiftRow(4, 2, s1, s2, s3);
+    arrayShiftColReverse(1, 0, s1, s2, s3);
+    arrayShiftRowReverse(3, 0, s1, s2, s3);
 }
 
 function createDeepCopy(cubelet1, cubelet2) {
