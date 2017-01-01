@@ -35,12 +35,65 @@ function Cubelet(id, transformStr) {
 cubelets = [];
 
 function main() {
+  addEventListeners();
   setUpCubeletInfo();
   assignTransformStrs();
 }
 
 
+//keeps track of the (x,y) position of the cursor while it is being held down,
+//set to (-1,-1) when the cursor is not held down
+x = y = -1;
+
+//current orientation of the WHOLE cube
+cubeOrientation = "rotateY(30deg)";
+
 main();
+
+
+function addEventListeners() {
+
+  document.addEventListener("mousedown", function(event) {
+    x = event.clientX;
+    y = event.clientY;
+  });
+
+  document.addEventListener("mouseup", function(event) {
+    x = y = -1;
+  });
+
+  document.addEventListener("mousemove", function(event) {
+
+    //mouse is presssed down
+    if (x != -1 && y != -1) {
+
+      var newX, newY, deltaX, deltaY;
+
+      newX = event.clientX;
+      newY = event.clientY;
+      
+      deltaX = newX - x;
+      deltaY = newY - y;
+
+      if (deltaX > 0) {
+        rotateCube("Y", true);
+      } else if (deltaX < 0) {
+        rotateCube("Y", false);
+      }
+
+      if (deltaY > 0) {
+        rotateCube("X", false);
+      } else if (deltaY < 0) {
+        rotateCube("X", true);
+      }
+
+      x = newX;
+      y = newY;
+
+    }
+
+  });
+}
 
 /*generates the styles.css cubelet ids, and their default transforms
 
@@ -110,6 +163,27 @@ function assignTransformStrs() {
       }
     }
   }
+}
+
+//rotates the whole cube across the dimension by one degree
+function rotateCube(dimension, isClockwise) {
+
+  var unitDegree;
+  if (isClockwise) {
+    unitDegree = 1;
+  }
+  else {
+    unitDegree = -1;
+  }
+
+  var newTransformStr = addDegrees(cubeOrientation, dimension, unitDegree);
+
+  cubeOrientation = newTransformStr;
+
+  var element = document.getElementById("cube");
+  element.offsetHeight;
+  element.style.transform = newTransformStr;
+
 }
 
 function rotateFrontFace(isClockwise) {
