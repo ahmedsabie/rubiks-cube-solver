@@ -124,7 +124,7 @@ private:
     std::string retraceHalfPath (Trie &cubesSeen, std::string &currentCubeString);
     
 public:
-    RubiksCubeSolver(RubiksCube cube);
+    RubiksCubeSolver(char cube[6][3][3]);
     int findMinNumberOfMoves();
     std::string getPath();
 };
@@ -132,8 +132,8 @@ public:
 
 
 
-RubiksCubeSolver::RubiksCubeSolver(RubiksCube cube) {
-    this -> cube = cube;
+RubiksCubeSolver::RubiksCubeSolver(char cube[6][3][3]) {
+    this -> cube = RubiksCube(cube);
     solvedState = RubiksCube(solvedCubeArray);
     fwdPath = "";
     bkwdPath = "";
@@ -281,6 +281,8 @@ std::string RubiksCubeSolver::retraceHalfPath(Trie &cubesSeen, std::string &curr
 }
 
 std::string RubiksCubeSolver::getPath() {
+	findMinNumberOfMoves();
+	
     std::string newFwdPath = "", newBkwdPath = "";
     
     // reverse order of fwdPath
