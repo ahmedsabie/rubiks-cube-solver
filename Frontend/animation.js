@@ -34,10 +34,11 @@ function Cubelet(id, transformStr) {
 //cubelets will be stored in this 3D array, with the 3 indices representing face, row, and col respectively
 cubelets = [];
 
-function mainAnimation() {
+function mainAnimation(colorArray) {
   addEventListeners();
   setUpCubeletInfo();
   assignTransformStrs();
+  colorCube(colorArray);
 }
 
 
@@ -163,6 +164,18 @@ function assignTransformStrs() {
     }
   }
 }
+
+function colorCube(colorArray) {
+  for (var i = 0; i < cubelets.length; i++) {
+    for (var j = 0; j < cubelets[i].length; j++) {
+      for (var k = 0; k < cubelets[i][j].length; k++) {
+        var element = document.getElementById(cubelets[i][j][k].id);
+        element.style.backgroundColor = colorArray[i][j][k];
+      }
+    }
+  }
+}
+
 
 //rotates the whole cube across the dimension by one degree
 function rotateCube(dimension, isClockwise) {

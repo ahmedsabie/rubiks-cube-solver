@@ -69,7 +69,7 @@ function createNet() {
 
 
 				//center pieces can never change
-				if (!(i === 1 && j === 1)){
+				if (!(j === 1 && k === 1)){
 
 					square.addEventListener("click", function() {
 							
@@ -143,7 +143,7 @@ function cubeIsValid() {
 function startSolving() {
 	clear();
 	showCube();
-	mainAnimation();
+	mainAnimation(getColorArray());
 	return;
 }
 
@@ -157,4 +157,21 @@ function clear() {
 	}
 
 	button.style.display = "none";
+}
+
+function getColorArray() {
+	var colors = [];
+
+	for (var i = 0; i < 6; i++) {
+		face = [];
+		for (var j = 0; j < 3; j++) {
+			row = [];
+			for (var k = 0; k < 3; k++) {
+				row.push(squares[i][j][k].style.backgroundColor);
+			}
+			face.push(row);
+		}
+		colors.push(face);
+	}
+	return colors;
 }
