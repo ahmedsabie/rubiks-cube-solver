@@ -34,7 +34,7 @@ function Cubelet(id, transformStr) {
 //cubelets will be stored in this 3D array, with the 3 indices representing face, row, and col respectively
 cubelets = [];
 
-function main() {
+function mainAnimation() {
   addEventListeners();
   setUpCubeletInfo();
   assignTransformStrs();
@@ -48,7 +48,6 @@ x = y = -1;
 //current orientation of the WHOLE cube
 cubeOrientation = "rotateY(30deg)";
 
-main();
 
 
 function addEventListeners() {
