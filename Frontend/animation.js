@@ -39,6 +39,12 @@ function mainAnimation(colorArray) {
   setUpCubeletInfo();
   assignTransformStrs();
   colorCube(colorArray);
+
+  var colorString = arrayToString(colorArray);
+
+  var moves = Module.getMoves(colorString);
+
+  simulateMoves(moves);
 }
 
 
@@ -176,6 +182,75 @@ function colorCube(colorArray) {
   }
 }
 
+//converts colors of rubiks cube into string form,
+//which is what the solver requires
+function arrayToString(colorArray) {
+  var str = "";
+
+  for (var i = 0; i < colorArray.length; i++) {
+    for (var j = 0; j < colorArray[i].length; j++) {
+      for (var k = 0; k < colorArray[i][j].length; k++) {
+        var color = colorArray[i][j][k];
+
+        str += color[0].toUpperCase();
+      }
+    }
+  }
+
+  return str;
+
+}
+
+function simulateMoves(moves) {
+  var delay = 0;
+
+  var moveToFunction = {
+    "F " : function() {
+      rotateFrontFace(true);
+    },
+    "F'" : function() {
+      rotateFrontFace(false);
+    },
+    "L " : function() {
+      rotateLeftFace(true);
+    },
+    "L'" : function() {
+      rotateLeftFace(false);
+    },
+    "R " : function() {
+      rotateRightFace(true);
+    },
+    "R'" : function() {
+      rotateRightFace(false);
+    },
+    "U " : function() {
+      rotateUpFace(true);
+    },
+    "U'" : function() {
+      rotateUpFace(false);
+    },
+    "D " : function() {
+      rotateDownFace(true);
+    },
+    "D'" : function() {
+      rotateDownFace(false);
+    },
+    "B " : function() {
+      rotateBackFace(true);
+    },
+    "B'" : function() {
+      rotateBackFace(false);
+    }
+  };
+
+  for (var i = 0; i < moves.length; i+=2) {
+    var move = moves[i] + moves[i+1];
+    var func = moveToFunction[move];
+
+    setTimeout(func, delay);
+    delay += 2000;
+  }
+}
 
 //rotates the whole cube across the dimension by one degree
 function rotateCube(dimension, isClockwise) {
