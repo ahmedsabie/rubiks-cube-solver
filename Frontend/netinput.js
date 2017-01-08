@@ -133,7 +133,33 @@ function cubeIsValid() {
 			isValid = false;
 		}
 	}
-	return isValid;
+
+	if (!isValid) {
+		alert("Make sure there are 9 occurences of each color!");
+	}
+
+	centers = [];
+	for (var i = 0; i < 6; i++) {
+		centers.push(squares[i][1][1].style.backgroundColor);
+	}
+
+	var centerMissing = false;
+	for (var i = 0; i < colorCenter.length; i++) {
+		
+		var color = colorCenter[i];
+
+		var index = centers.indexOf(color);
+		//console.log(index);
+		if (index === -1) {
+			centerMissing = true;
+		}
+	}
+
+	if (centerMissing) {
+		alert("The center pieces have to be distinct colors!");
+	}
+
+	return isValid && !centerMissing;
 }
 
 function startSolving() {
