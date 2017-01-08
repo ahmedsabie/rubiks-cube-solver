@@ -1,9 +1,11 @@
 #include "RubiksCubeSolver.h"
-#include <emscripten/bind.h>
+#include <iostream>
+using namespace std;
+//#include <emscripten/bind.h>
 
-using namespace emscripten;
+//using namespace emscripten;
 
-std::string getMoves(std::string stringCube) {
+std::string getMoves(std::string stringCube, std::string centerColors) {
 	char cube[6][3][3];
 	int index = 0;
 
@@ -15,10 +17,15 @@ std::string getMoves(std::string stringCube) {
 		}
 	}
 
-    RubiksCubeSolver solved(cube);
+    RubiksCubeSolver solved(cube, centerColors);
     return solved.getPath();
 }
 
-EMSCRIPTEN_BINDINGS(my_module) {
+/*EMSCRIPTEN_BINDINGS(my_module) {
     function("getMoves", &getMoves);
+}*/
+int main() {
+    std::string c = "RRRRRRRRRGGGGGGGGGBBBBBBBBBOOOOOOOOOWWWWWWWWWYYYYYYYYY";
+    string k = "RGBOWY";
+    cout<<getMoves(c, k)<<endl;
 }

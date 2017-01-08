@@ -41,8 +41,9 @@ function mainAnimation(colorArray) {
   colorCube(colorArray);
 
   var colorString = arrayToString(colorArray);
+  var getCenters = getCenterColor(colorArray);
 
-  var moves = Module.getMoves(colorString);
+  var moves = Module.getMoves(colorString, getCenters);
 
   simulateMoves(moves);
 }
@@ -199,6 +200,17 @@ function arrayToString(colorArray) {
 
   return str;
 
+}
+
+function getCenterColor(colorArray) {
+  var str = "";
+  for (var i = 0; i < colorArray.length; i++) {
+    //center piece color 
+    var color = colorArray[i][1][1];
+
+    str += color[0].toUpperCase();
+  }
+  return str;
 }
 
 function simulateMoves(moves) {

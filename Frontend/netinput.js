@@ -20,8 +20,8 @@ shiftY = [
 squareSide * 3, 
 squareSide * 3, 
 squareSide * 3, 
-squareSide * 6,
 squareSide * 0,
+squareSide * 6,
 squareSide * 3,
 ];
 
@@ -68,17 +68,13 @@ function createNet() {
 				square.style.backgroundColor = colorCenter[i];
 
 
-				//center pieces can never change
-				if (!(j === 1 && k === 1)){
+				square.addEventListener("click", function() {
+						
+					var index = colorCenter.indexOf(this.style.backgroundColor);
 
-					square.addEventListener("click", function() {
-							
-						var index = colorCenter.indexOf(this.style.backgroundColor);
-
-						index = (index + 1) % colorCenter.length;
-						this.style.backgroundColor = colorCenter[index];
-						});
-				}
+					index = (index + 1) % colorCenter.length;
+					this.style.backgroundColor = colorCenter[index];
+					});
 
 				net.appendChild(square);
 				row.push(square);

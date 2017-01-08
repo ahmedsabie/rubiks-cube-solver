@@ -10,78 +10,13 @@
 struct RubiksCubeSolver {
     
 private:
-    char solvedCubeArray[6][3][3] = {
-        {
-            {
-                'R','R','R',
-            },
-            {
-                'R','R','R',
-            },
-            {
-                'R','R','R',
-            },
-        },
-        {
-            {
-                'G','G','G',
-            },
-            {
-                'G','G','G',
-            },
-            {
-                'G','G','G',
-            },
-        },
-        {
-            {
-                'B','B','B',
-            },
-            {
-                'B','B','B',
-            },
-            {
-                'B','B','B',
-            },
-        },
-        {
-            {
-                'W','W','W',
-            },
-            {
-                'W','W','W',
-            },
-            {
-                'W','W','W',
-            },
-        },
-        {
-            {
-                'Y','Y','Y',
-            },
-            {
-                'Y','Y','Y',
-            },
-            {
-                'Y','Y','Y',
-            },
-        },
-        {
-            {
-                'O','O','O',
-            },
-            {
-                'O','O','O',
-            },
-            {
-                'O','O','O',
-            },
-        },
-    };
+    char solvedCubeArray[6][3][3];
     RubiksCube cube;
     RubiksCube solvedState;
     const int MAX_MOVES = 26;
     
+	void generateSolvedCubeArray(std::string centerColors);
+	
     int bidirectionalBFS();
     
     void tryLeftClockwiseTurn(Trie &cubesSeen, std::queue<std::pair<RubiksCube,int> > &activeCubes,
@@ -124,16 +59,25 @@ private:
     std::string retraceHalfPath (Trie &cubesSeen, std::string &currentCubeString);
     
 public:
-    RubiksCubeSolver(char cube[6][3][3]);
+    RubiksCubeSolver(char cube[6][3][3], std::string centerColors);
     int findMinNumberOfMoves();
     std::string getPath();
 };
 
 
+void RubiksCubeSolver::generateSolvedCubeArray(std::string centerColors) {
+	for (int i = 0; i < 6; i++) {
+		for (int j = 0; j < 3; j++) {
+			for (int k = 0; k < 3; k++) {
+				solvedCubeArray[i][j][k] = centerColors[i];
+			}
+		}
+	}
+}
 
-
-RubiksCubeSolver::RubiksCubeSolver(char cube[6][3][3]) {
+RubiksCubeSolver::RubiksCubeSolver(char cube[6][3][3], std::string centerColors) {
     this -> cube = RubiksCube(cube);
+	generateSolvedCubeArray(centerColors);
     solvedState = RubiksCube(solvedCubeArray);
     fwdPath = "";
     bkwdPath = "";
